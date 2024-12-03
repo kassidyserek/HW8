@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   KASS SEREK / COMP272 002
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -103,8 +103,32 @@ public class Graph {
    */
   
   public int findRoot() {
+    int[] incomingEdges = new int[numVertices];
 
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
-  } 
+    // count incoming edges for each vertex
+    for (int i = 0; i < numVertices; i++) {
+      for (int neighbor : adjListArr[i]) {
+        incomingEdges[neighbor]++;
+      }
+    }
+
+    // check for the root
+    int root = -1;
+    for (int i = 0; i < numVertices; i++) {
+      if (incomingEdges[i] == 0) {
+        if (root != -1) {
+          // more than one root found
+          return -1;
+        }
+        root = i;
+      }
+    }
+
+    // return the value of the root vertex, not the index
+    if (root != -1) {
+      return vertexValues.get(root);
+    } else {
+      return -1;
+    }
+  }
 }
