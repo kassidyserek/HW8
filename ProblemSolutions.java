@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   KASS SEREK / COMP272 002
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -74,16 +74,50 @@ class ProblemSolutions {
 
     public boolean canFinish(int numExams, 
                              int[][] prerequisites) {
-      
+
         int numNodes = numExams;  // # of nodes in graph
 
         // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        ArrayList<Integer>[] adj = getAdjList(numExams,
+                                        prerequisites);
 
-        // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
+        // array to track the visitation state of each node
+        int[] visitState = new int[numNodes];
 
+        // check for cycles using DFS for each node
+        for (int node = 0; node < numNodes; node++) {
+            // start DFS only on unvisited nodes
+            if (visitState[node] == 0) {
+                Stack<Integer> stack = new Stack<>();
+                stack.push(node);
+
+                while (!stack.isEmpty()) {
+                    int current = stack.peek();
+
+                    // if the node is being visited, process its neighbors
+                    if (visitState[current] == 0) {
+                        // mark as visiting
+                        visitState[current] = 1;
+                        for (int neighbor : adj[current]) {
+                            if (visitState[neighbor] == 0) {
+                                // explore unvisited neighbor
+                                stack.push(neighbor);
+                            } else if (visitState[neighbor] == 1) {
+                                // cycle detected
+                                return false;
+                            }
+                        }
+                    } else {
+                        // mark node as fully processed
+                        visitState[current] = 2;
+                        stack.pop();
+                    }
+                }
+            }
+        }
+
+        // no cycles found, return true
+        return true;
     }
 
 
@@ -164,8 +198,10 @@ class ProblemSolutions {
      */
 
     public int numGroups(int[][] adjMatrix) {
+        // get number of nodes
         int numNodes = adjMatrix.length;
-        Map<Integer,List<Integer>> graph = new HashMap();
+        // create graph
+        Map<Integer,List<Integer>> graph = new HashMap<>();
         int i = 0, j =0;
 
         /*
@@ -174,13 +210,13 @@ class ProblemSolutions {
          * sample code illustrates a technique to do so.
          */
 
-        for(i = 0; i < numNodes ; i++){
-            for(j = 0; j < numNodes; j++){
-                if( adjMatrix[i][j] == 1 && i != j ){
+        for (i = 0; i < numNodes; i++) {
+            for (j = 0; j < numNodes; j++) {
+                if (adjMatrix[i][j] == 1 && i != j) {
                     // Add AdjList for node i if not there
-                    graph.putIfAbsent(i, new ArrayList());
+                    graph.putIfAbsent(i, new ArrayList<>());
                     // Add AdjList for node j if not there
-                    graph.putIfAbsent(j, new ArrayList());
+                    graph.putIfAbsent(j, new ArrayList<>());
 
                     // Update node i adjList to include node j
                     graph.get(i).add(j);
@@ -190,9 +226,43 @@ class ProblemSolutions {
             }
         }
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+        // initialize visited set and group count
+        Set<Integer> visited = new HashSet<>();
+        int groupCount = 0;
+
+        // perform DFS to count connected components
+        for (int node = 0; node < numNodes; node++) {
+            if (!visited.contains(node)) {
+                // start a new DFS for this component
+                Stack<Integer> stack = new Stack<>();
+                stack.push(node);
+
+                // traverse the graph
+                while (!stack.isEmpty()) {
+                    // get current node
+                    int current = stack.pop();
+                    // if the node hasn't been visited
+                    if (!visited.contains(current)) {
+                        // mark it as visited
+                        visited.add(current);
+                        // check if the current node has neighbors
+                        if (graph.containsKey(current)) {
+                            // add all unvisited neighbors to the stack
+                            for (int neighbor : graph.get(current)) {
+                                if (!visited.contains(neighbor)) {
+                                    stack.push(neighbor);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // increment group count
+                groupCount++;
+            }
+        }
+
+        return groupCount;
     }
 
 }
